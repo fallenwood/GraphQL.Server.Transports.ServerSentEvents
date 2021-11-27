@@ -7,8 +7,6 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "GraphQL.Server.Transports.S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Server.Transports.ServerSentEvents.Samples", "GraphQL.Server.Transports.ServerSentEvents.Samples\GraphQL.Server.Transports.ServerSentEvents.Samples.csproj", "{24832859-2CF7-4AB9-8637-069A82A0F434}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Server.Transports.ServerSentEvents.Extensions", "GraphQL.Server.Transports.ServerSentEvents.Extensions\GraphQL.Server.Transports.ServerSentEvents.Extensions.csproj", "{03EF17EB-230F-43C7-9F03-74FECFD13AED}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{24832859-2CF7-4AB9-8637-069A82A0F434}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24832859-2CF7-4AB9-8637-069A82A0F434}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24832859-2CF7-4AB9-8637-069A82A0F434}.Release|Any CPU.Build.0 = Release|Any CPU
-		{03EF17EB-230F-43C7-9F03-74FECFD13AED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{03EF17EB-230F-43C7-9F03-74FECFD13AED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{03EF17EB-230F-43C7-9F03-74FECFD13AED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{03EF17EB-230F-43C7-9F03-74FECFD13AED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

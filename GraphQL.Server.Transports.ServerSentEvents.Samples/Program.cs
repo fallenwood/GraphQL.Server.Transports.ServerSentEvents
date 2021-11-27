@@ -2,7 +2,6 @@ using GraphQL;
 using GraphQL.Server;
 using GraphQL.Server.Transports.AspNetCore;
 using GraphQL.Server.Transports.ServerSentEvents;
-using GraphQL.Server.Transports.ServerSentEvents.Extensions;
 using GraphQL.Server.Transports.ServerSentEvents.Samples;
 
 var builder = WebApplication.CreateBuilder(args);

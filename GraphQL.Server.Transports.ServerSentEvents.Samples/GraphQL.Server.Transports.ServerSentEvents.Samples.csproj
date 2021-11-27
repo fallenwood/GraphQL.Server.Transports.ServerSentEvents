@@ -11,7 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GraphQL.Server.Transports.ServerSentEvents.Extensions\GraphQL.Server.Transports.ServerSentEvents.Extensions.csproj" />
     <ProjectReference Include="..\GraphQL.Server.Transports.ServerSentEvents\GraphQL.Server.Transports.ServerSentEvents.fsproj" />
   </ItemGroup>
 

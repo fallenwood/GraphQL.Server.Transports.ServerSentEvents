@@ -16,6 +16,7 @@
     <Compile Include="IServerSentEventsConnectionFactory.fs" />
     <Compile Include="ServerSentEventsConnectionFactory.fs" />
     <Compile Include="GraphQLServerSentEventsMiddleware.fs" />
+    <Compile Include="Extensions.fs" />
   </ItemGroup>
 
   <ItemGroup>
