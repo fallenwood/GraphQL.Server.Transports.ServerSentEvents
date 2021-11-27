@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "GraphQL.Server.Transports.ServerSentEvents", "GraphQL.Server.Transports.ServerSentEvents\GraphQL.Server.Transports.ServerSentEvents.fsproj", "{EFAF1F2C-0BB4-41A3-9DF4-ED9B19A20859}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Server.Transports.ServerSentEvents.Samples", "GraphQL.Server.Transports.ServerSentEvents.Samples\GraphQL.Server.Transports.ServerSentEvents.Samples.csproj", "{24832859-2CF7-4AB9-8637-069A82A0F434}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Server.Transports.ServerSentEvents.Extensions", "GraphQL.Server.Transports.ServerSentEvents.Extensions\GraphQL.Server.Transports.ServerSentEvents.Extensions.csproj", "{03EF17EB-230F-43C7-9F03-74FECFD13AED}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EFAF1F2C-0BB4-41A3-9DF4-ED9B19A20859}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFAF1F2C-0BB4-41A3-9DF4-ED9B19A20859}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFAF1F2C-0BB4-41A3-9DF4-ED9B19A20859}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFAF1F2C-0BB4-41A3-9DF4-ED9B19A20859}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24832859-2CF7-4AB9-8637-069A82A0F434}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24832859-2CF7-4AB9-8637-069A82A0F434}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24832859-2CF7-4AB9-8637-069A82A0F434}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24832859-2CF7-4AB9-8637-069A82A0F434}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03EF17EB-230F-43C7-9F03-74FECFD13AED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03EF17EB-230F-43C7-9F03-74FECFD13AED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03EF17EB-230F-43C7-9F03-74FECFD13AED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03EF17EB-230F-43C7-9F03-74FECFD13AED}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F031A086-F85B-42A4-AD13-4B59BAC7F4B9}
+	EndGlobalSection
+EndGlobal

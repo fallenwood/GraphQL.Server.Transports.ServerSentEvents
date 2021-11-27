@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="ServerSentEventsOperationMessage.fs" />
+    <Compile Include="ServerSentEventsContext.fs" />
+    <Compile Include="ServerSentEventsReaderPipeline.fs" />
+    <Compile Include="ServerSentEventsWriterPipeline.fs" />
+    <Compile Include="ServerSentEventsTransport.fs" />
+    <Compile Include="ServerSentEventsSubscriptionManager.fs" />
+    <Compile Include="ServerSentEventsConnection.fs" />
+    <Compile Include="IServerSentEventsConnectionFactory.fs" />
+    <Compile Include="ServerSentEventsConnectionFactory.fs" />
+    <Compile Include="GraphQLServerSentEventsMiddleware.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Control.AsyncSeq" />
+    <PackageReference Include="GraphQL.Server.Core" />
+    <PackageReference Include="GraphQL.Server.Transports.AspNetCore" />
+    <PackageReference Include="GraphQL.Server.Transports.Subscriptions.Abstractions" />
+  </ItemGroup>
+
+</Project>

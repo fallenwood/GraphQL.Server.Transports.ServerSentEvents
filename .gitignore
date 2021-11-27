@@ -1,0 +1,9 @@
+*.DS_Store
+
+.vs/
+.idea/
+*.user
+*.suo
+
+[Oo]bj/
+[Bb]in/

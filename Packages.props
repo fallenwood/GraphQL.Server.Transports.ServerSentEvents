@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <GraphQLServerVersion>5.0.2</GraphQLServerVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Update="GraphQL.Server.Core" Version="$(GraphQLServerVersion)" />
+    <PackageReference Update="GraphQL.Server.Transports.AspNetCore" Version="$(GraphQLServerVersion)" />
+    <PackageReference Update="GraphQL.Server.Transports.Subscriptions.Abstractions" Version="$(GraphQLServerVersion)" />
+    <PackageReference Update="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="$(GraphQLServerVersion)" />
+    <PackageReference Update="Microsoft.AspNetCore.App" IsImplicitlyDefined="true" />    
+    <PackageReference Update="FSharp.Control.AsyncSeq" Version="3.2.1" />
+  </ItemGroup>
+
+</Project>
