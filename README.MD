@@ -34,9 +34,10 @@ mutation AddMessage($message: MessageInputType!) {
 ## TODOs
  - [x] Fix single connection
  - [ ] Unit tests
- - [ ] Github actions
+ - [x] Github actions
  - [ ] Test with more cases
  - [ ] Beautify example
+ - [ ] Publish to Nuget
 
 ## License
 MIT
