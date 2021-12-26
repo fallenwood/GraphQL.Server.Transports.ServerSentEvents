@@ -6,8 +6,8 @@ const messages = document.querySelector("#messages") as HTMLDivElement;
 // @ts-ignore
 window.subscribe = async () => {
   const client = createClient({
-    // singleConnection: false,  // preferred for HTTP/1 enabled servers. read more below
-    singleConnection: true,  // preferred for HTTP/1 enabled servers. read more below
+    singleConnection: false,
+    // singleConnection: true,  // preferred for HTTP/1 enabled servers. read more below
     url: '/graphql?id=test_by_vite',
   });
 

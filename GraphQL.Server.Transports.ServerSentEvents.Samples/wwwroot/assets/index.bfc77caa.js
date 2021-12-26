@@ -1,0 +1,6 @@
+import{c}from"./vendor.1a0a0092.js";const l=function(){const r=document.createElement("link").relList;if(r&&r.supports&&r.supports("modulepreload"))return;for(const e of document.querySelectorAll('link[rel="modulepreload"]'))o(e);new MutationObserver(e=>{for(const t of e)if(t.type==="childList")for(const s of t.addedNodes)s.tagName==="LINK"&&s.rel==="modulepreload"&&o(s)}).observe(document,{childList:!0,subtree:!0});function n(e){const t={};return e.integrity&&(t.integrity=e.integrity),e.referrerpolicy&&(t.referrerPolicy=e.referrerpolicy),e.crossorigin==="use-credentials"?t.credentials="include":e.crossorigin==="anonymous"?t.credentials="omit":t.credentials="same-origin",t}function o(e){if(e.ep)return;e.ep=!0;const t=n(e);fetch(e.href,t)}};l();const d=document.querySelector("#messages");window.subscribe=async()=>{const i=c({singleConnection:!1,url:"/graphql?id=test_by_vite"}),r=n=>{console.log("New Incoming message",JSON.stringify(n));const o=document.createElement("div");o.innerHTML=JSON.stringify(n),d.appendChild(o)};i.subscribe({query:`subscription MessageAdded {
+          messageAdded {
+            from { id displayName }
+            content
+          }
+        }`},{next:r,error:console.error,complete:()=>{}})};

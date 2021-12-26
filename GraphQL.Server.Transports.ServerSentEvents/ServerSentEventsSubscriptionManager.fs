@@ -18,6 +18,8 @@ type ServerSentEventsSubscriptionManager(executer: IGraphQLExecuter, loggerFacto
   let execute(id: string, payload: OperationMessagePayload, context: MessageHandlingContext) =
     let writer = context.Writer
 
+    logger.LogTrace("Executing...")
+
     async {
       let variable =
         match payload.Variables with
@@ -30,34 +32,28 @@ type ServerSentEventsSubscriptionManager(executer: IGraphQLExecuter, loggerFacto
         | null -> false
         | errors -> errors.Any()
 
-      return
+      let! subscription = async {
         match hasError with 
         | true ->
-          writer.SendAsync(OperationMessage(Type = MessageType.GQL_ERROR, Id = id, Payload = result))
-          |> Async.AwaitTask
-          |> ignore
-          None
+          let! _ = writer.SendAsync(OperationMessage(Type = MessageType.GQL_ERROR, Id = id, Payload = result)) |> Async.AwaitTask
+          return None
         | false -> 
           match result with
           | :? SubscriptionExecutionResult as subscriptionExecutionResult ->
               match subscriptionExecutionResult.Streams.Values.SingleOrDefault() with 
               | null ->
-                writer.SendAsync(OperationMessage(Type = MessageType.GQL_ERROR, Id = id, Payload = result))
-                |> Async.AwaitTask
-                |> ignore
-                None
+                let! _ = writer.SendAsync(OperationMessage(Type = MessageType.GQL_ERROR, Id = id, Payload = result)) |> Async.AwaitTask
+                return None
               | _ ->
                 let remove = fun _ -> subscriptions.TryRemove(id) |> ignore
                 let subscription = Subscription(id, payload, subscriptionExecutionResult, writer, remove, loggerFactory.CreateLogger<Subscription>())
-                Some subscription
+                return Some subscription
           | _ ->
-            writer.SendAsync(OperationMessage(Type = MessageType.GQL_DATA, Id = id, Payload = result))
-            |> Async.AwaitTask
-            |> ignore
-            writer.SendAsync(OperationMessage(Type = MessageType.GQL_COMPLETE, Id = id))
-            |> Async.AwaitTask
-            |> ignore
-            None
+            let! _ = writer.SendAsync(OperationMessage(Type = MessageType.GQL_DATA, Id = id, Payload = result)) |> Async.AwaitTask
+            let! _  = writer.SendAsync(OperationMessage(Type = MessageType.GQL_COMPLETE, Id = id)) |> Async.AwaitTask
+            return None
+      }
+      return subscription
     }
 
   interface ISubscriptionManager with
