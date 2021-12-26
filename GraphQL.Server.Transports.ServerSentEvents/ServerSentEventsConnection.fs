@@ -1,15 +1,13 @@
 ﻿
 namespace GraphQL.Server.Transports.ServerSentEvents
 
-open GraphQL.Server.Transports.Subscriptions.Abstractions
-
-type ServerSentEventsConnection(transport: ServerSentEventsTransport, subscriptionServer: SubscriptionServer) =
+type ServerSentEventsConnection(transport: ServerSentEventsTransport, subscriptionServer: ServerSentEventsSubscriptionServer) =
   member val transport = transport
   member val server = subscriptionServer
 
   member this.Connect() =
     async {
-      let! _ =  this.server.OnConnect() |> Async.AwaitTask
-      let! _ = this.server.OnDisconnect() |> Async.AwaitTask
+      let! _ =  this.server.OnConnect() |> Async.Ignore
+      let! _ = this.server.OnDisconnect() |> Async.Ignore
       this.transport.CloseAsync() |> Async.AwaitTask |> ignore
     }

@@ -34,33 +34,37 @@ type ServerSentEventsReaderPipeline(
         | (false, _) ->
           logger.LogTrace("Sse context not found")
           None
-        | (true, context) -> Some context
+        | (true, context) ->
+          logger.LogTrace("SSe context Found")
+          Some context
 
     match sseContext with
     | None ->
+      logger.LogTrace("Sse Context Not found, reading from http context")
       use memoryStream = new MemoryStream()
       context.Request.Body.CopyToAsync(memoryStream)
       |> Async.AwaitTask
       |> ignore
       let message = Encoding.UTF8.GetString(memoryStream.ToArray())
+      logger.LogTrace("Read Message {}", message)
       readMessageFromContextAsync(target, ServerSentEventsOperationMessage(id=null, type_=MessageType.GQL_START, payload=message))
       |> ignore
     | Some sseContext -> 
+      logger.LogTrace("Sse Context found, recursiving")
       // Why currying not work?
       // let action = readMessageFromContextAsync target
       let action = fun e -> readMessageFromContextAsync(target, e)
       let rec f() = 
-        // TODO: receivers may not be loaded/iterated corrently 
-        let readerContexts = sseContext.getAllReceivers(context.RequestAborted)
+        async {
+          logger.LogTrace("will call getReceiver {}", context.Connection.Id)
+          let readerContexts = sseContext.getAllReceivers(context.RequestAborted)
 
-        match context.RequestAborted.IsCancellationRequested with 
-        | true -> ()
-        | false ->
-           AsyncSeq.ofAsyncEnum(readerContexts)
-           |> AsyncSeq.iterAsync action
-           |> Async.Ignore
-           |> ignore
-           f()
+          let! _ =
+            AsyncSeq.ofAsyncEnum(readerContexts)
+            |> AsyncSeq.iterAsync action
+          f()
+        }
+        |> Async.Start
       f()
 
   let createMessageReader() = 
@@ -74,28 +78,29 @@ type ServerSentEventsReaderPipeline(
 
   let createReaderJsonTransformer() = 
     let transfomer(input: ServerSentEventsOperationMessage) : OperationMessage =
-       let payload = JObject.FromObject(JsonConvert.DeserializeObject(input.Payload, serializerSettings))
-       let operationIdOrNull =
-         match payload.TryGetValue("extensions") with
-         | (true, extensions) ->
-           match extensions with
-           | :? JObject as extensionsObject -> 
-             match extensionsObject.TryGetValue("operationId") with
-             | (false, _) ->
-               logger.LogTrace("OperationId not found in extensions")
-               null
-             | (true, operationIdToken) -> operationIdToken.Value<string>()
-           | _ -> null
-         | (false, _) -> null
-       let operationId = 
-         match operationIdOrNull with
-         | null ->
-           // TODO: ?? operator?
-           match input.Id with
-           | null -> context.Connection.Id
-           | token -> token
-         | token -> token
-       OperationMessage(Type=MessageType.GQL_START, Payload=payload, Id=operationId)
+      logger.LogTrace("Transfoming")
+      let payload = JObject.FromObject(JsonConvert.DeserializeObject(input.Payload, serializerSettings))
+      let operationIdOrNull =
+        match payload.TryGetValue("extensions") with
+        | (true, extensions) ->
+          match extensions with
+          | :? JObject as extensionsObject -> 
+            match extensionsObject.TryGetValue("operationId") with
+            | (false, _) ->
+              logger.LogTrace("OperationId not found in extensions")
+              null
+            | (true, operationIdToken) -> operationIdToken.Value<string>()
+          | _ -> null
+        | (false, _) -> null
+      let operationId = 
+        match operationIdOrNull with
+        | null ->
+          // TODO: ?? operator?
+          match input.Id with
+          | null -> context.Connection.Id
+          | token -> token
+        | token -> token
+      OperationMessage(Type=MessageType.GQL_START, Payload=payload, Id=operationId)
     TransformBlock<ServerSentEventsOperationMessage, OperationMessage>(transfomer, ExecutionDataflowBlockOptions(EnsureOrdered=true))
 
   let _startBlock = createMessageReader()
@@ -115,6 +120,7 @@ type ServerSentEventsReaderPipeline(
     member this.Completion: Task = 
       this.endBlock.Completion
 
-    member this.LinkTo(target: ITargetBlock<OperationMessage>): unit = 
+    member this.LinkTo(target: ITargetBlock<OperationMessage>): unit =
+      logger.LogTrace("Linking Reader endBlock")
       this.endBlock.LinkTo(target, DataflowLinkOptions(PropagateCompletion=true))
       |> ignore

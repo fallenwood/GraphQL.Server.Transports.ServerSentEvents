@@ -15,58 +15,50 @@ type ServerSentEventsWriterPipeline(context: HttpContext, documentWriter: IDocum
     | true -> Task.CompletedTask
     | false ->
       let stream = context.Response.Body
-      let result =  
-        match token with
-        | null ->
+      match token with
+      | null ->
+        match message.Type with
+        | MessageType.GQL_DATA ->
+          task {
+            let! _ = context.Response.WriteAsync("event: next\ndata: ") |> Async.AwaitTask
+            let! _ = documentWriter.WriteAsync(stream, message.Payload) |> Async.AwaitTask
+            let! _ = context.Response.WriteAsync("\n\n") |> Async.AwaitTask
+            return ()
+          }
+        | MessageType.GQL_COMPLETE -> 
+          context.Response.WriteAsync("event: complete\n\n")
+        | _ -> Task.CompletedTask
+      | _ ->
           match message.Type with
           | MessageType.GQL_DATA ->
-            async {
+            task {
               let! _ = context.Response.WriteAsync("event: next\ndata: ") |> Async.AwaitTask
-              let! _ = documentWriter.WriteAsync(stream, message.Payload) |> Async.AwaitTask
-              context.Response.WriteAsync("\n\n") |> Async.AwaitTask |> ignore
+              let! _ =  documentWriter.WriteAsync(stream, {| Id = message.Id; Payload = message.Payload |}) |> Async.AwaitTask
+              let! _ = context.Response.WriteAsync("\n\n") |> Async.AwaitTask
+              return ()
             }
-            |> Async.StartAsTask
-            :> Task
-          | MessageType.GQL_COMPLETE -> 
-            context.Response.WriteAsync("event: complete\n\n")
-            |> Async.AwaitTask
-            |> Async.StartAsTask
-            :> Task
+          | MessageType.GQL_COMPLETE ->
+            task {
+              let! _ = context.Response.WriteAsync("event: complete") |> Async.AwaitTask
+              let! _ = documentWriter.WriteAsync(stream, OperationMessage(Id = message.Id)) |> Async.AwaitTask
+              let! _ = context.Response.WriteAsync("\n\n") |> Async.AwaitTask
+              return ()
+            }
           | _ -> Task.CompletedTask
-        | _ ->
-            match message.Type with
-            | MessageType.GQL_DATA ->
-              async {
-                let! _ = context.Response.WriteAsync("event: next\ndata: ") |> Async.AwaitTask
-                let! _ =  documentWriter.WriteAsync(stream, message.Payload) |> Async.AwaitTask
-                context.Response.WriteAsync("\n\n") |> Async.AwaitTask |> ignore
-              }
-              |> Async.StartAsTask
-              :> Task
-            | MessageType.GQL_COMPLETE ->
-              async {
-                let! _ = context.Response.WriteAsync("event: complete") |> Async.AwaitTask
-                let! _ = documentWriter.WriteAsync(stream, OperationMessage(Id = message.Id)) |> Async.AwaitTask
-                context.Response.WriteAsync("\n\n") |> Async.AwaitTask |> ignore
-              }
-              |> Async.StartAsTask
-              :> Task
-            | _ -> Task.CompletedTask
-      result
 
   let createMessageWriter() =
     ActionBlock<OperationMessage>(writeMessageAsync, ExecutionDataflowBlockOptions(MaxDegreeOfParallelism = 1, EnsureOrdered = true))
   
-  member _.startBlock = createMessageWriter()
+  let startBlock = createMessageWriter()
 
   interface IWriterPipeline with
-    member this.Complete(): Task = 
-      this.startBlock.Complete()
+    member _.Complete(): Task = 
+      startBlock.Complete()
       Task.CompletedTask
-    member this.Completion: Task = 
-      this.startBlock.Completion
-    member this.Post(message: OperationMessage): bool = 
-        this.startBlock.Post(message)
-    member this.SendAsync(message: OperationMessage): Task = 
-        this.startBlock.SendAsync(message)
+    member _.Completion: Task = 
+      startBlock.Completion
+    member _.Post(message: OperationMessage): bool = 
+      startBlock.Post(message)
+    member _.SendAsync(message: OperationMessage): Task = 
+      startBlock.SendAsync(message)
  

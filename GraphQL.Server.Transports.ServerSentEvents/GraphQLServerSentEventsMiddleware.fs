@@ -15,10 +15,9 @@ open System.Threading.Tasks
 type GraphQLServerSentEventsMiddleware<'T when 'T :> ISchema>(next: RequestDelegate, logger: ILogger<GraphQLServerSentEventsMiddleware<'T>>) =
   let GraphQLEventStreamTokenHeader = "x-graphql-event-stream-token"
   let EventStreamContentType = "text/event-stream"
-  member val next= next
-  member val logger = logger
 
   member _.HandleSenderRequest(context: HttpContext, serverSentEventsContext: ServerSentEventsContext, type_: string, operationId: string) =
+    logger.LogTrace("Handling Sender Request {}", context.Request.PathBase)
     async {
       use memoryStream = new MemoryStream()
       let! _ = context.Request.Body.CopyToAsync(memoryStream) |> Async.AwaitTask
@@ -30,12 +29,13 @@ type GraphQLServerSentEventsMiddleware<'T when 'T :> ISchema>(next: RequestDeleg
      }
 
   member _.HandleReceiverRequest(context: HttpContext, token: string) = 
+    logger.LogTrace("Handling Receiver Request {}", context.Request.PathBase)
     async {
       context.Response.ContentType <- EventStreamContentType
       let! _ = context.Response.Body.FlushAsync() |> Async.AwaitTask
       let connectionFactory = context.RequestServices.GetRequiredService<IServerSentEventsConnectionFactory<'T>>()
       let connection = connectionFactory.createConnection(context, token, context.Connection.Id)
-      let! _ = connection.Connect() |> Async.Ignore
+      let! _ = connection.Connect()
       context.RequestAborted.WaitHandle.WaitOne() |> ignore
     }
   
@@ -43,7 +43,9 @@ type GraphQLServerSentEventsMiddleware<'T when 'T :> ISchema>(next: RequestDeleg
     let request = context.Request
     let response = context.Response
 
-    let invoke() = this.next.Invoke(context) |> Async.AwaitTask
+    let invoke() =     
+      logger.LogTrace("Invoking next {}", context.Request.PathBase)
+      next.Invoke(context) |> Async.AwaitTask
 
     let accepts =
       match request.Headers.TryGetValue("Accept") with
@@ -51,6 +53,7 @@ type GraphQLServerSentEventsMiddleware<'T when 'T :> ISchema>(next: RequestDeleg
       | (true, _1) -> _1.ToArray()
 
     let created() = 
+      logger.LogTrace("Handling Created {}", context.Request.PathBase)
       async {
         let token = Guid.NewGuid().ToString()
         response.StatusCode <- (int)HttpStatusCode.Created
@@ -59,6 +62,7 @@ type GraphQLServerSentEventsMiddleware<'T when 'T :> ISchema>(next: RequestDeleg
       }
 
     let handleGet(token) = 
+      logger.LogTrace("Handling Get {} {}", context.Request.PathBase, token)
       async {
         let sseContext = ServerSentEventsContext(context)
         ServerSentEventsContext.Collection.TryAdd(token, sseContext) |> ignore

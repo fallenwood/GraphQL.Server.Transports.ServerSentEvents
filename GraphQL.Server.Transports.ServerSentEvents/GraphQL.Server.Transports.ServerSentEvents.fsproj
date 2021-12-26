@@ -12,6 +12,7 @@
     <Compile Include="ServerSentEventsWriterPipeline.fs" />
     <Compile Include="ServerSentEventsTransport.fs" />
     <Compile Include="ServerSentEventsSubscriptionManager.fs" />
+    <Compile Include="ServerSentEventsSubscriptionServer.fs" />
     <Compile Include="ServerSentEventsConnection.fs" />
     <Compile Include="IServerSentEventsConnectionFactory.fs" />
     <Compile Include="ServerSentEventsConnectionFactory.fs" />

@@ -23,10 +23,11 @@ type ServerSentEventsConnectionFactory<'T when 'T :> ISchema>(
   interface IServerSentEventsConnectionFactory<'T> with
     member this.createConnection(context: HttpContext, token: string, connectionId: string) = 
       let transport = ServerSentEventsTransport(context, this.documentWriter, token, this.loggerFactory)
-      let manager = SubscriptionManager(this.executer, this.loggerFactory)
-      let server = SubscriptionServer(
+      let manager = ServerSentEventsSubscriptionManager(this.executer, this.loggerFactory)
+      let server = ServerSentEventsSubscriptionServer(
+        context,
         transport,
         manager,
         this.messageListeners,
-        this.loggerFactory.CreateLogger<SubscriptionServer>())
+        this.loggerFactory.CreateLogger<ServerSentEventsSubscriptionServer>())
       ServerSentEventsConnection(transport, server)

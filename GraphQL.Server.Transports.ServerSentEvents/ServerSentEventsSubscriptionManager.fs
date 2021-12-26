@@ -12,7 +12,7 @@ open System.Threading.Tasks
 
 type ServerSentEventsSubscriptionManager(executer: IGraphQLExecuter, loggerFactory: ILoggerFactory) =
   
-  // let logger = loggerFactory.CreateLogger<ServerSentEventsSubscriptionManager>()
+  let logger = loggerFactory.CreateLogger<ServerSentEventsSubscriptionManager>()
   let subscriptions = ConcurrentDictionary<string, Subscription>()
 
   let execute(id: string, payload: OperationMessagePayload, context: MessageHandlingContext) =
@@ -57,7 +57,8 @@ type ServerSentEventsSubscriptionManager(executer: IGraphQLExecuter, loggerFacto
             writer.SendAsync(OperationMessage(Type = MessageType.GQL_COMPLETE, Id = id))
             |> Async.AwaitTask
             |> ignore
-            None }
+            None
+    }
 
   interface ISubscriptionManager with
     member _.GetEnumerator(): System.Collections.Generic.IEnumerator<Subscription> = 
@@ -66,22 +67,18 @@ type ServerSentEventsSubscriptionManager(executer: IGraphQLExecuter, loggerFacto
       subscriptions.Values.GetEnumerator()
 
     member _.SubscribeOrExecuteAsync(id: string, payload: OperationMessagePayload, context: MessageHandlingContext): Task = 
-      async {
+      task {
         let! subscription = execute(id, payload, context)
         return
           match subscription with 
           | None -> ()
           | Some sub -> 
             subscriptions.TryAdd(id, sub) 
-            |> ignore }
-      |> Async.StartAsTask 
-      :> Task
+            |> ignore
+      }
       
     member _.UnsubscribeAsync(id: string): Task = 
       match subscriptions.TryRemove(id) with
       | (false, _) -> Task.CompletedTask
       | (true, removed) ->
         removed.UnsubscribeAsync()
-        |> Async.AwaitTask
-        |> Async.StartAsTask
-        :> Task
