@@ -33,6 +33,8 @@ mutation AddMessage($message: MessageInputType!) {
 
 ## TODOs
  - [x] Fix single connection
+ - [] Unit tests
+ - [] Github actions
  - [] Test with more cases
  - [] Beautify example
 
